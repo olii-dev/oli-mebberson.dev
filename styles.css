@@ -269,18 +269,20 @@ p {
     color: var(--hover-color);
 }
 
-.stunning {
+.amazing {
     font-weight: bold;
     background: linear-gradient(to right, #d4af37, var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    transition: color 0.3s ease, transform 0.3s ease;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-.stunning:hover {
-    color: var(--text-color);
+.amazing:hover {
+    color: var(--secondary-color);
     transform: scale(1.1);
-    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
+    text-shadow: 0 0 10px var(--secondary-color), 0 0 20px var(--secondary-color), 0 0 30px var(--secondary-color);
+    transition: text-shadow 0.3s ease;
+    text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37, 0 0 15px var(--secondary-color), 0 0 20px var(--secondary-color);
 }
 
 #timeline {
