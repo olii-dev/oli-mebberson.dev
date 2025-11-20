@@ -14,7 +14,8 @@
 
 body {
     font-family: 'Recursive', sans-serif;
-    background-color: var(--background-color);
+    background: linear-gradient(135deg, #000 0%, #1a1a2e 50%, #16213e 100%);
+    background-attachment: fixed;
     color: var(--text-color);
     line-height: 1.6;
 }
@@ -89,7 +90,10 @@ a {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #222;
+    background: rgba(34, 34, 34, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
@@ -107,7 +111,11 @@ a {
 .section {
     padding: 80px 20px;
     text-align: center;
-    background-color: #222;
+    background: rgba(34, 34, 34, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     animation: subtleFadeInUp 1s ease-in-out;
 }
 
@@ -120,10 +128,13 @@ a {
 }
 
 .project {
-    background-color: #333;
+    background: rgba(51, 51, 51, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     width: 300px;
     height: 300px;
     text-align: center;
@@ -131,13 +142,14 @@ a {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     animation: subtleFadeInUp 1s ease-in-out;
 }
 
 .project:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.6);
+    background: rgba(51, 51, 51, 0.5);
 }
 
 .project h3 {
@@ -198,20 +210,24 @@ p {
 }
 
 .pill {
-    background-color: var(--background-color);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px 20px;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     display: flex;
     align-items: center;
     gap: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     animation: subtleFadeInUp 1s ease-in-out;
 }
 
 .pill:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.5);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .pill i {
@@ -237,24 +253,28 @@ p {
 }
 
 .tech-stack-item {
-    background-color: var(--background-color);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     width: 120px;
     height: 120px;
     padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     animation: subtleFadeInUp 1s ease-in-out;
 }
 
 .tech-stack-item:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.5);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .tech-stack-item i {
@@ -288,7 +308,11 @@ p {
 #timeline {
     padding: 80px 20px;
     text-align: center;
-    background-color: #222;
+    background: rgba(34, 34, 34, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
 }
 
@@ -323,13 +347,16 @@ p {
 }
 
 .timeline-content {
-    background-color: #333;
+    background: rgba(51, 51, 51, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     position: relative;
     z-index: 1;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s ease, background 0.3s ease;
     overflow: hidden;
 }
 
@@ -353,6 +380,7 @@ p {
 
 .timeline-content:hover {
     transform: scale(1.1);
+    background: rgba(51, 51, 51, 0.5);
 }
 
 .timeline-content h3 {
