@@ -4,223 +4,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="Portfolio of Oli Mebberson, a web developer and designer.">
     <meta name="keywords" content="web development, design, portfolio, Oli Mebberson">
+    <meta property="og:title" content="Oli Mebberson | Portfolio">
+    <meta property="og:description" content="Web developer and designer building clean, functional applications. Creator of Reko and Breezy.">
+    <meta property="og:url" content="https://oli-mebberson.is-cool.dev/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Oli Mebberson | Portfolio">
+    <meta name="twitter:description" content="Web developer and designer building clean, functional applications.">
     <title>Oli Mebberson | Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="images/favicon.png" type="image/x-icon">
 </head>
 
 <body>
+    <div id="loader" class="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="toast" class="toast">Copied!</div>
+
+    <div id="scroll-progress"></div>
+
+    <canvas id="particles"></canvas>
+
+    <nav id="navbar" class="navbar">
+        <div class="nav-inner">
+            <a href="#hero" class="nav-logo">OM</a>
+            <div class="nav-links">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#tech-stack" class="nav-link">Tech</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#timeline" class="nav-link">Journey</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <div class="nav-mobile">
+            <a href="#about" class="nav-link">About</a>
+            <a href="#tech-stack" class="nav-link">Tech</a>
+            <a href="#projects" class="nav-link">Projects</a>
+            <a href="#timeline" class="nav-link">Journey</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <div class="orbs" aria-hidden="true">
+        <div class="orb-parallax orb-parallax-1">
+            <div class="orb orb-1"></div>
+        </div>
+        <div class="orb-parallax orb-parallax-2">
+            <div class="orb orb-2"></div>
+        </div>
+        <div class="orb-parallax orb-parallax-3">
+            <div class="orb orb-3"></div>
+        </div>
+    </div>
+
     <header>
         <section id="hero">
             <div class="hero-content">
                 <h1>Hey, I'm Oli</h1>
-                <p>Full Stack Web Developer & Designer</p>
-                <br>
+                <p><span id="typed-text"></span><span class="typed-cursor">|</span></p>
                 <nav class="social-links">
                     <a href="https://github.com/olii-dev" target="_blank" class="social-link" aria-label="GitHub">
-                        <i class="fab fa-github" alt="GitHub"></i>
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://twitter.com/olii_dev" target="_blank" class="social-link" aria-label="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://bsky.app/profile/funnylollypop.bsky.social" target="_blank" class="social-link" aria-label="Bluesky">
+                        <svg class="social-icon" viewBox="0 0 64 57" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55c2.897-6.013 10.79-17.218 18.127-22.745C56.965-2.284 64-4.436 64 6.13c0 2.566-1.468 21.533-2.326 24.63C59.18 40.79 48.438 43.73 38.265 41.14c10.932 1.89 13.686 7.724 7.69 15.858L32 57l-13.955-.002c-5.996-8.134-3.242-13.968 7.69-15.858-15.173 2.59-20.915-.35-23.409-10.38C1.468 27.663 0 8.696 0 6.13 0-4.436 7.035-2.284 13.873 3.805z"/></svg>
+                    </a>
+                    <a href="https://discord.gg/Trxcqusfgc" target="_blank" class="social-link" aria-label="Discord">
+                        <i class="fab fa-discord"></i>
                     </a>
                     <a href="https://dev.to/oliidev" target="_blank" class="social-link" aria-label="Dev.to">
-                        <i class="fab fa-dev" alt="Dev.to"></i>
+                        <i class="fab fa-dev"></i>
                     </a>
                 </nav>
             </div>
         </section>
     </header>
+
     <main>
         <section id="about" class="section">
-            <h2>About Me</h2>
-            <p>I'm a young web developer who loves creating <b>clean</b>, <b>working</b>, apps and sites that look and
-                feel <b class="amazing">amazing</b>.
-                I am apart of the <a
+            <h2 class="reveal">About Me</h2>
+            <p class="reveal">I'm a web developer and designer passionate about building clean, functional applications with
+                polished interfaces. I'm a member of the <a
                     href="https://docs.github.com/en/get-started/exploring-integrations/github-developer-program"
-                    target="_blank" class="fancy-underline">
-                    GitHub Developer Program</a> because of <a href="https://olii-dev.github.io/Octo-Board/"
-                    target="_blank" class="fancy-underline">'Octo Board'</a>
-                which is a project I created where you can see <b>anyones</b> GitHub statistics! When I'm not coding, I
-                enjoy gaming, taking photos on my iPhone, and checking
-                out new tech I can purchase!</p>
-            <div class="pill-container">
+                    target="_blank" class="fancy-underline">GitHub Developer Program</a> — recognized for building <a
+                    href="https://olii-dev.github.io/Octo-Board/" target="_blank"
+                    class="fancy-underline">Octo Board</a>, an open-source GitHub
+                statistics dashboard. When I'm not shipping code, I enjoy gaming, photography, and exploring new tech.</p>
+            <div class="pill-container reveal" data-stagger="80">
                 <div class="pill">
-                    <i class="fas fa-calendar-alt" alt="Age"></i>
-                    <span>16y/o</span>
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>17y/o</span>
                 </div>
                 <div class="pill">
-                    <i class="fas fa-globe-oceania" alt="Timezone"></i>
+                    <i class="fas fa-clock"></i>
                     <span>UTC+10:30</span>
                 </div>
                 <div class="pill">
-                    <i class="fas fa-map-marker-alt" alt="Location"></i>
+                    <i class="fas fa-map-marker-alt"></i>
                     <span>Australia</span>
                 </div>
                 <div class="pill">
-                    <i class="fa-solid fa-user" alt="Pronouns"></i>
+                    <i class="fa-solid fa-user"></i>
                     <span>He/Him</span>
                 </div>
             </div>
         </section>
 
         <section id="tech-stack" class="section">
-            <h2>Tech Stack</h2>
-            <div class="tech-stack-container">
+            <h2 class="reveal">Tech Stack</h2>
+            <div class="tech-stack-container reveal" data-stagger="60">
                 <div class="tech-stack-item">
-                    <i class="fab fa-html5" alt="HTML"></i>
+                    <i class="fab fa-html5"></i>
                     <span>HTML</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fab fa-css3-alt" alt="CSS"></i>
+                    <i class="fab fa-css3-alt"></i>
                     <span>CSS</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fab fa-js" alt="JavaScript"></i>
+                    <i class="fab fa-js"></i>
                     <span>JavaScript</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fab fa-python" alt="Python"></i>
+                    <i class="fab fa-python"></i>
                     <span>Python</span>
                 </div>
-            </div>
-            <div class="tech-stack-container">
                 <div class="tech-stack-item">
-                    <i class="fab fa-git-alt" alt="Git"></i>
+                    <i class="fab fa-git-alt"></i>
                     <span>Git</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fab fa-github" alt="GitHub"></i>
+                    <i class="fab fa-github"></i>
                     <span>GitHub</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fa fa-code" alt="VS Code"></i>
+                    <i class="fa fa-code"></i>
                     <span>VS Code</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fa-brands fa-swift" alt="Swift"></i>
+                    <i class="fa-brands fa-swift"></i>
                     <span>Swift</span>
                 </div>
                 <div class="tech-stack-item">
-                    <i class="fab fa-linux" alt="Linux"></i>
+                    <i class="fab fa-linux"></i>
                     <span>Linux</span>
+                </div>
+                <div class="tech-stack-item">
+                    <i class="fa-brands fa-swift"></i>
+                    <span>SwiftUI</span>
+                </div>
+                <div class="tech-stack-item">
+                    <i class="fas fa-terminal"></i>
+                    <span>Ghostty</span>
+                </div>
+                <div class="tech-stack-item">
+                    <i class="fas fa-wrench"></i>
+                    <span>Xcode</span>
                 </div>
             </div>
         </section>
 
         <section id="projects" class="section">
-            <h2>Projects</h2>
-            <div class="projects-container">
-                <article class="project">
-                    <h3>Weatherly</h3>
-                    <p>View your local weather (privately).</p>
-                    <a href="https://olii-dev.github.io/weatherly/" target="_blank" class="project-link">View
-                        Weatherly</a>
-                </article>
-                <article class="project">
-                    <h3>Stashr</h3>
-                    <p>Manage what you're saving up for!</p>
-                    <a href="https://olii-dev.github.io/Stashr/" target="_blank" class="project-link">View Stashr</a>
-                </article>
-                <article class="project">
-                    <h3>quip</h3>
-                    <p> quip is a GUI for OpenRouter,<br>you can chat to AI's.</p>
-                    <a href="https://olii-dev.github.io/quip/" target="_blank" class="project-link">View quip</a>
-                </article>
-                <div class="featured-wrapper">
+            <h2 class="reveal">Projects</h2>
+            <div class="projects-container" data-stagger="100">
+                <div class="featured-wrapper reveal">
                     <article class="project featured">
                         <h3>Reko</h3>
-                        <p>Personalised movie and TV show recommendations based on what you love. <br><b>Available on
-                                iOS.</b></p>
-                        <a href="https://olii-dev.github.io/reko-site/index.html" target="_blank"
-                            class="project-link">View Reko</a>
+                        <p>Personalised movie and TV show recommendations based on what you love.
+                            <b>Available on iOS.</b></p>
+                        <div class="project-links">
+                            <a href="https://olii-dev.github.io/reko-site/" target="_blank"
+                                class="project-link">Website</a>
+                            <a href="https://apps.apple.com/us/app/reko/id6756222907" target="_blank"
+                                class="project-link">
+                                <i class="fab fa-apple"></i> App Store
+                            </a>
+                        </div>
                     </article>
                 </div>
+                <article class="project reveal">
+                    <h3>Breezy <span class="badge">Beta</span></h3>
+                    <p>Your personal weather companion. View local weather beautifully and privately.</p>
+                    <a href="https://olii-dev.github.io/breezy-site/" target="_blank"
+                        class="project-link">View Breezy</a>
+                </article>
+                <article class="project reveal">
+                    <h3>Stashr</h3>
+                    <p>Manage what you're saving up for.</p>
+                    <a href="https://olii-dev.github.io/Stashr/" target="_blank" class="project-link">View Stashr</a>
+                </article>
+                <article class="project reveal">
+                    <h3>quip</h3>
+                    <p>A GUI for OpenRouter. Chat with AI models through a clean interface.</p>
+                    <a href="https://olii-dev.github.io/quip/" target="_blank" class="project-link">View quip</a>
+                </article>
             </div>
         </section>
 
         <section id="timeline" class="section">
-            <h2>My Journey</h2>
-            <div class="timeline-container">
-                <div class="timeline-item">
+            <h2 class="reveal">My Journey</h2>
+            <div class="timeline-container" data-stagger="100">
+                <div class="timeline-item reveal">
                     <div class="timeline-content">
-                        <h3>Wrote my first lines of code</h3>
-                        <p>At the age of <b class="stunning">eight</b> my Dad helped me make my first <a
-                                href="https://olimebberson.github.io/olidraw/" target="_blank"
-                                class="fancy-underline">website!</a></p>
                         <span class="timeline-date">2017</span>
+                        <h3>Wrote my first lines of code</h3>
+                        <p>At the age of eight, my Dad helped me make my <a
+                                href="https://olimebberson.github.io/olidraw/" target="_blank"
+                                class="fancy-underline">first website</a>.</p>
                         <div class="timeline-extra">
-                            <p>I had <b>so</b> much fun on this project with my Dad and it sparked something in me! This
-                                was <b>eight</b> years ago!</p>
+                            <p>I had so much fun on this project with my Dad and it sparked something in me. That was
+                                over eight years ago!</p>
                         </div>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-content">
-                        <h3>Created my first website (with my Dad)</h3>
-                        <p>I created my <i>first</i> proper personal website!</p>
                         <span class="timeline-date">2018</span>
+                        <h3>Built my first proper website</h3>
+                        <p>Created my first real personal website with my Dad.</p>
                         <div class="timeline-extra">
-                            <p>I remember creating this and it felt amazing working <a
-                                    href="https://olimebberson.github.io/www/index.html" target="_blank"
-                                    class="fancy-underline">this site</a> with my Dad!! If only I could have that
-                                feeling again...</p>
+                            <p>Working on <a href="https://olimebberson.github.io/www/index.html" target="_blank"
+                                    class="fancy-underline">this site</a> with my Dad was an amazing experience — the
+                                feeling of building something together was unforgettable.</p>
                         </div>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-content">
-                        <h3>Started Coding again</h3>
-                        <p>After a long time of not coding I came back!</p>
                         <span class="timeline-date">March 2024</span>
+                        <h3>Returned to coding</h3>
+                        <p>After a long break, I came back to development and started building again.</p>
                         <div class="timeline-extra">
-                            <p>At this time I was just making my SwiftUI app called 'Sliffer' so nothing too
-                                interesting. Sliffer is a place to find iOS Shortcuts! <a
+                            <p>I started with a SwiftUI app called 'Sliffer' — a place to find iOS Shortcuts. <a
                                     href="https://olii-dev.github.io/sliffer/" target="_blank"
-                                    class="fancy-underline">Check it out</a>!</p>
+                                    class="fancy-underline">Check it out</a>.</p>
                         </div>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-content">
-                        <h3>Created a portfolio</h3>
-                        <p>I created a portfolio that would display my work and what I do.</p>
                         <span class="timeline-date">June 2024</span>
+                        <h3>Created my first portfolio</h3>
+                        <p>Built a portfolio to showcase my work and what I do.</p>
                         <div class="timeline-extra">
-                            <p>I thought I was pretty cool for doing this, haha. It was really just for me anyway.</p>
+                            <p>My first real attempt at putting myself out there as a developer.</p>
                         </div>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-content">
-                        <h3>Updated Portfolio</h3>
-                        <p>My portfolio was getting outdated and too complicated, so I started again.</p>
                         <span class="timeline-date">January 2025</span>
+                        <h3>Rebuilt from scratch</h3>
+                        <p>My portfolio was getting outdated, so I redesigned and rewrote it.</p>
                         <div class="timeline-extra">
-                            <p>This is the website your reading this very sentence from now!</p>
+                            <p>Simplified the design and focused on what matters — clean presentation of my work.</p>
                         </div>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-content">
-                        <h3>Today</h3>
-                        <p>This is where I am now.</p>
-                        <span class="timeline-date">May 2025</span>
-                        <div class="timeline-extra">
-                            <p>I am still in school (almost done!) so I haven't done anything too crazy yet, I haven't
-                                been doing much apart from small things because I am focusing on school a lot.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-content">
-                        <h3>Launched Reko</h3>
-                        <p>I released my biggest app yet!</p>
                         <span class="timeline-date">January 2026</span>
+                        <h3>Launched Reko</h3>
+                        <p>Shipped my biggest app yet — a movie and TV show recommendation engine on iOS.</p>
                         <div class="timeline-extra">
-                            <p>Reko is a powerful movie and TV show recommendation engine. I built the entire stack
-                                including the iOS app and website. It's been a huge milestone for me!</p>
+                            <p>Reko is a personalised recommendation engine for movies and TV shows. I built the entire
+                                stack including the iOS app and website. <a
+                                    href="https://apps.apple.com/us/app/reko/id6756222907" target="_blank"
+                                    class="fancy-underline">Download on the App Store</a>.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-content">
+                        <span class="timeline-date">April 2026</span>
+                        <h3>Released Breezy into beta</h3>
+                        <p>Launched a beautiful, privacy-first weather app.</p>
+                        <div class="timeline-extra">
+                            <p>Breezy is a personal weather companion — clean, private, and currently in beta. <a
+                                    href="https://olii-dev.github.io/breezy-site/" target="_blank"
+                                    class="fancy-underline">Learn more</a>.</p>
                         </div>
                     </div>
                 </div>
@@ -228,12 +306,48 @@
         </section>
 
         <section id="contact" class="section">
-            <h2>Contact</h2>
-            <p>Feel free to reach out via <a href="mailto:oli@mebberson.com" class="fancy-underline">email</a> or
-                connect with me on <a href="https://github.com/olii-dev" target="_blank"
-                    class="fancy-underline">GitHub</a>.</p>
+            <h2 class="reveal">Get in Touch</h2>
+            <p class="reveal">Feel free to reach out via <a href="mailto:oli@mebberson.com"
+                    class="fancy-underline" id="email-copy">email</a> or connect with me on <a
+                    href="https://github.com/olii-dev" target="_blank" class="fancy-underline">GitHub</a>.</p>
+            <div class="social-links reveal" style="margin-top: 30px;">
+                <a href="https://github.com/olii-dev" target="_blank" class="social-link" aria-label="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://twitter.com/olii_dev" target="_blank" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://bsky.app/profile/funnylollypop.bsky.social" target="_blank" class="social-link" aria-label="Bluesky">
+                    <svg class="social-icon" viewBox="0 0 64 57" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55c2.897-6.013 10.79-17.218 18.127-22.745C56.965-2.284 64-4.436 64 6.13c0 2.566-1.468 21.533-2.326 24.63C59.18 40.79 48.438 43.73 38.265 41.14c10.932 1.89 13.686 7.724 7.69 15.858L32 57l-13.955-.002c-5.996-8.134-3.242-13.968 7.69-15.858-15.173 2.59-20.915-.35-23.409-10.38C1.468 27.663 0 8.696 0 6.13 0-4.436 7.035-2.284 13.873 3.805z"/></svg>
+                </a>
+                <a href="https://discord.gg/Trxcqusfgc" target="_blank" class="social-link" aria-label="Discord">
+                    <i class="fab fa-discord"></i>
+                </a>
+                <a href="https://dev.to/oliidev" target="_blank" class="social-link" aria-label="Dev.to">
+                    <i class="fab fa-dev"></i>
+                </a>
+            </div>
         </section>
     </main>
+
+    <footer>
+        <div class="footer-inner">
+            <p>&copy; 2026 Oli Mebberson. Built by hand with HTML, CSS & a little JS.</p>
+            <div class="footer-links">
+                <a href="https://github.com/olii-dev" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/olii_dev" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://bsky.app/profile/funnylollypop.bsky.social" target="_blank" aria-label="Bluesky"><svg class="social-icon" viewBox="0 0 64 57" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55c2.897-6.013 10.79-17.218 18.127-22.745C56.965-2.284 64-4.436 64 6.13c0 2.566-1.468 21.533-2.326 24.63C59.18 40.79 48.438 43.73 38.265 41.14c10.932 1.89 13.686 7.724 7.69 15.858L32 57l-13.955-.002c-5.996-8.134-3.242-13.968 7.69-15.858-15.173 2.59-20.915-.35-23.409-10.38C1.468 27.663 0 8.696 0 6.13 0-4.436 7.035-2.284 13.873 3.805z"/></svg></a>
+                <a href="https://discord.gg/Trxcqusfgc" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                <a href="https://dev.to/oliidev" target="_blank" aria-label="Dev.to"><i class="fab fa-dev"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
 </body>
 
 </html>
