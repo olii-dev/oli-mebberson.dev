@@ -318,16 +318,121 @@
         var history = [];
         var busy = false;
 
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function safeUrl(url) {
+            try {
+                var u = new URL(url, window.location.origin);
+                if (u.protocol === 'http:' || u.protocol === 'https:' || u.protocol === 'mailto:') {
+                    return u.href;
+                }
+            } catch (e) { /* ignore */ }
+            return null;
+        }
+
+        // Lightweight markdown: bold, italic, links, lists, paragraphs, inline code
+        function renderMarkdown(src) {
+            var text = String(src || '').replace(/\r\n/g, '\n').trim();
+            if (!text) return '';
+
+            // Normalize angle-bracket autolinks: <https://...>
+            text = text.replace(/<(https?:\/\/[^>\s]+)>/g, '[$1]($1)');
+            text = text.replace(/<(mailto:[^>\s]+)>/gi, '[$1]($1)');
+
+            var lines = text.split('\n');
+            var html = [];
+            var inList = false;
+
+            function closeList() {
+                if (inList) {
+                    html.push('</ul>');
+                    inList = false;
+                }
+            }
+
+            function inlineFormat(line) {
+                var escaped = escapeHtml(line);
+                // inline code
+                escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+                // links [label](url)
+                escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, label, url) {
+                    var href = safeUrl(url.trim());
+                    if (!href) return escapeHtml(label);
+                    return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+                });
+                // bare URLs
+                escaped = escaped.replace(/(^|[\s(])(https?:\/\/[^\s<]+)/g, function (_, pre, url) {
+                    var href = safeUrl(url.replace(/[.,);]+$/, ''));
+                    var trailing = href ? url.slice(href.length) : '';
+                    if (!href) return pre + url;
+                    return pre + '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + href + '</a>' + trailing;
+                });
+                // bold ** **
+                escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                // italic * *
+                escaped = escaped.replace(/(^|[^\*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+                return escaped;
+            }
+
+            for (var i = 0; i < lines.length; i++) {
+                var raw = lines[i];
+                var listMatch = raw.match(/^\s*[-*]\s+(.+)$/);
+                if (listMatch) {
+                    if (!inList) {
+                        html.push('<ul>');
+                        inList = true;
+                    }
+                    html.push('<li>' + inlineFormat(listMatch[1]) + '</li>');
+                    continue;
+                }
+                closeList();
+                if (!raw.trim()) {
+                    html.push('<div class="ask-oli-gap"></div>');
+                    continue;
+                }
+                html.push('<p>' + inlineFormat(raw) + '</p>');
+            }
+            closeList();
+            return html.join('');
+        }
+
+        function setBubbleContent(bubble, text, thinking, asMarkdown) {
+            if (thinking) {
+                bubble.classList.add('is-thinking');
+                bubble.innerHTML =
+                    '<span class="ask-oli-thinking">' +
+                    '<span></span><span></span><span></span>' +
+                    '</span>';
+                return;
+            }
+            bubble.classList.remove('is-thinking');
+            if (asMarkdown) {
+                bubble.innerHTML = renderMarkdown(text);
+            } else {
+                bubble.textContent = text;
+            }
+        }
+
         function openPanel() {
             root.classList.add('is-open');
             panel.hidden = false;
             fab.setAttribute('aria-expanded', 'true');
+            panel.classList.remove('ask-oli-panel-anim');
+            void panel.offsetWidth;
+            panel.classList.add('ask-oli-panel-anim');
             if (!messagesEl.children.length) {
                 renderEmpty();
             }
             setTimeout(function () {
                 input.focus();
-            }, 120);
+            }, 160);
         }
 
         function closePanel() {
@@ -340,33 +445,41 @@
             messagesEl.innerHTML =
                 '<div class="ask-oli-empty">' +
                 '<strong>Hey — I\'m Lio</strong>' +
-                '<p>Ask me about Oli\'s projects, Lattice, Reko, Breezy, Orbit, or how to reach him. Off-topic questions get a polite redirect.</p>' +
+                '<p>Ask me about Oli\'s projects, Lattice, Reko, Breezy, Orbit, or how to reach him.</p>' +
                 '</div>';
         }
 
         function clearEmpty() {
             var empty = messagesEl.querySelector('.ask-oli-empty');
-            if (empty) empty.remove();
+            if (empty) {
+                empty.classList.add('is-leaving');
+                setTimeout(function () {
+                    if (empty.parentNode) empty.remove();
+                }, 180);
+            }
         }
 
         function appendMessage(role, text, thinking) {
             clearEmpty();
             var wrap = document.createElement('div');
-            wrap.className = 'ask-oli-msg is-' + (role === 'user' ? 'user' : 'bot');
+            wrap.className = 'ask-oli-msg is-' + (role === 'user' ? 'user' : 'bot') + ' is-entering';
             var meta = document.createElement('div');
             meta.className = 'ask-oli-msg-meta';
             meta.textContent = role === 'user' ? 'You' : 'Lio';
             var bubble = document.createElement('div');
-            bubble.className = 'ask-oli-bubble' + (thinking ? ' is-thinking' : '');
-            bubble.textContent = text;
+            bubble.className = 'ask-oli-bubble';
+            setBubbleContent(bubble, text, thinking, role !== 'user');
             wrap.appendChild(meta);
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
             messagesEl.scrollTop = messagesEl.scrollHeight;
+            requestAnimationFrame(function () {
+                wrap.classList.add('is-visible');
+            });
             return bubble;
         }
 
-        async function askQuark(message) {
+        async function askLio(message) {
             if (!endpoint) {
                 return "Lio isn't connected yet. Deploy the Cloudflare Worker in /workers/ask-oli and set data-api on #ask-oli to your Worker URL.";
             }
@@ -385,7 +498,7 @@
             });
 
             if (!res.ok) {
-                throw new Error(data.error || data.message || 'Quark had trouble answering. Try again in a moment.');
+                throw new Error(data.error || data.message || 'Lio had trouble answering. Try again in a moment.');
             }
 
             return (data.reply || '').trim() || '…';
@@ -414,23 +527,24 @@
 
             busy = true;
             sendBtn.disabled = true;
+            sendBtn.classList.add('is-sending');
             input.value = '';
             appendMessage('user', text);
             history.push({ role: 'user', content: text });
 
-            var thinkingBubble = appendMessage('bot', 'Thinking…', true);
+            var thinkingBubble = appendMessage('bot', '', true);
 
             try {
-                var reply = await askQuark(text);
-                thinkingBubble.classList.remove('is-thinking');
-                thinkingBubble.textContent = reply;
+                var reply = await askLio(text);
+                setBubbleContent(thinkingBubble, reply, false, true);
+                thinkingBubble.classList.add('is-revealed');
                 history.push({ role: 'assistant', content: reply });
             } catch (err) {
-                thinkingBubble.classList.remove('is-thinking');
-                thinkingBubble.textContent = err.message || 'Something went wrong.';
+                setBubbleContent(thinkingBubble, err.message || 'Something went wrong.', false, false);
             } finally {
                 busy = false;
                 sendBtn.disabled = false;
+                sendBtn.classList.remove('is-sending');
                 messagesEl.scrollTop = messagesEl.scrollHeight;
                 input.focus();
             }

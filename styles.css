@@ -1178,7 +1178,19 @@ footer {
     color: var(--text-primary);
     cursor: pointer;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-    transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition), opacity 0.25s ease;
+    animation: askOliFabIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes askOliFabIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .ask-oli-fab:hover {
@@ -1188,9 +1200,23 @@ footer {
     box-shadow: 0 16px 40px rgba(56, 189, 248, 0.18);
 }
 
+.ask-oli-fab:active {
+    transform: translateY(0) scale(0.97);
+}
+
 .ask-oli-fab i {
     color: var(--accent-1);
     font-size: 16px;
+    animation: askOliIconPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes askOliIconPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+.ask-oli.is-open .ask-oli-fab i {
+    animation: none;
 }
 
 .ask-oli-fab-label {
@@ -1220,7 +1246,10 @@ footer {
     -webkit-backdrop-filter: blur(var(--blur-strong));
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
     overflow: hidden;
-    animation: askOliIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ask-oli-panel.ask-oli-panel-anim {
+    animation: askOliIn 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ask-oli-panel[hidden] {
@@ -1230,7 +1259,7 @@ footer {
 @keyframes askOliIn {
     from {
         opacity: 0;
-        transform: translateY(12px) scale(0.98);
+        transform: translateY(16px) scale(0.96);
     }
     to {
         opacity: 1;
@@ -1277,12 +1306,13 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background var(--transition), color var(--transition);
+    transition: background var(--transition), color var(--transition), transform 0.2s ease;
 }
 
 .ask-oli-close:hover {
     background: var(--surface-hover);
     color: var(--text-primary);
+    transform: rotate(90deg);
 }
 
 .ask-oli-messages {
@@ -1292,6 +1322,7 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    scroll-behavior: smooth;
 }
 
 .ask-oli-empty {
@@ -1299,6 +1330,24 @@ footer {
     text-align: center;
     max-width: 260px;
     color: var(--text-secondary);
+    animation: askOliEmptyIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.ask-oli-empty.is-leaving {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+}
+
+@keyframes askOliEmptyIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .ask-oli-empty strong {
@@ -1321,6 +1370,14 @@ footer {
     flex-direction: column;
     gap: 6px;
     max-width: 92%;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ask-oli-msg.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .ask-oli-msg.is-user {
@@ -1328,14 +1385,31 @@ footer {
     align-items: flex-end;
 }
 
+.ask-oli-msg.is-user.is-entering {
+    transform: translateY(10px) translateX(8px);
+}
+
+.ask-oli-msg.is-user.is-visible {
+    transform: translateY(0) translateX(0);
+}
+
 .ask-oli-msg.is-bot {
     align-self: flex-start;
     align-items: flex-start;
 }
 
+.ask-oli-msg.is-bot.is-entering {
+    transform: translateY(10px) translateX(-8px);
+}
+
+.ask-oli-msg.is-bot.is-visible {
+    transform: translateY(0) translateX(0);
+}
+
 .ask-oli-msg-meta {
     font-size: 11px;
     color: var(--text-muted);
+    opacity: 0.9;
 }
 
 .ask-oli-bubble {
@@ -1343,8 +1417,23 @@ footer {
     border-radius: 14px;
     font-size: 14px;
     line-height: 1.55;
-    white-space: pre-wrap;
     word-break: break-word;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.ask-oli-bubble.is-revealed {
+    animation: askOliReveal 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes askOliReveal {
+    from {
+        filter: blur(2px);
+        opacity: 0.55;
+    }
+    to {
+        filter: none;
+        opacity: 1;
+    }
 }
 
 .ask-oli-msg.is-user .ask-oli-bubble {
@@ -1352,6 +1441,7 @@ footer {
     border: 1px solid rgba(56, 189, 248, 0.28);
     color: var(--text-primary);
     border-bottom-right-radius: 4px;
+    white-space: pre-wrap;
 }
 
 .ask-oli-msg.is-bot .ask-oli-bubble {
@@ -1361,9 +1451,97 @@ footer {
     border-bottom-left-radius: 4px;
 }
 
+.ask-oli-bubble p {
+    margin: 0 0 0.55em;
+}
+
+.ask-oli-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.ask-oli-bubble .ask-oli-gap {
+    height: 0.45em;
+}
+
+.ask-oli-bubble ul {
+    margin: 0.35em 0 0.55em;
+    padding-left: 1.15em;
+}
+
+.ask-oli-bubble li {
+    margin: 0.2em 0;
+}
+
+.ask-oli-bubble strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.ask-oli-bubble em {
+    font-style: italic;
+    color: var(--text-primary);
+}
+
+.ask-oli-bubble code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88em;
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--accent-1);
+}
+
+.ask-oli-bubble a {
+    color: var(--accent-1);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.35);
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.ask-oli-bubble a:hover {
+    border-bottom-color: var(--accent-1);
+    color: #7dd3fc;
+}
+
 .ask-oli-bubble.is-thinking {
     color: var(--text-muted);
-    font-style: italic;
+    font-style: normal;
+    min-width: 52px;
+}
+
+.ask-oli-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 14px;
+}
+
+.ask-oli-thinking span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    opacity: 0.35;
+    animation: askOliDot 1.2s ease-in-out infinite;
+}
+
+.ask-oli-thinking span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.ask-oli-thinking span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes askOliDot {
+    0%, 80%, 100% {
+        transform: translateY(0);
+        opacity: 0.3;
+    }
+    40% {
+        transform: translateY(-3px);
+        opacity: 1;
+    }
 }
 
 .ask-oli-form {
@@ -1386,7 +1564,7 @@ footer {
     font-family: var(--font-body);
     font-size: 14px;
     outline: none;
-    transition: border-color var(--transition), background var(--transition);
+    transition: border-color var(--transition), background var(--transition), box-shadow 0.25s ease;
 }
 
 .ask-oli-input::placeholder {
@@ -1396,6 +1574,7 @@ footer {
 .ask-oli-input:focus {
     border-color: rgba(56, 189, 248, 0.45);
     background: var(--surface-hover);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
 }
 
 .ask-oli-send {
@@ -1416,6 +1595,16 @@ footer {
 .ask-oli-send:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+}
+
+.ask-oli-send.is-sending {
+    animation: askOliSendPulse 0.55s ease;
+}
+
+@keyframes askOliSendPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.88); }
+    100% { transform: scale(1); }
 }
 
 .ask-oli-send:disabled {
@@ -1453,5 +1642,25 @@ body.has-ask-oli .back-to-top {
     body.has-ask-oli .back-to-top {
         bottom: 76px;
         right: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ask-oli-fab,
+    .ask-oli-fab i,
+    .ask-oli-panel.ask-oli-panel-anim,
+    .ask-oli-empty,
+    .ask-oli-msg,
+    .ask-oli-bubble.is-revealed,
+    .ask-oli-thinking span,
+    .ask-oli-send.is-sending,
+    .ask-oli-close:hover {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
+
+    .ask-oli-msg {
+        opacity: 1;
     }
 }

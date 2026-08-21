@@ -95,6 +95,10 @@ HTML, CSS, JavaScript, Python, Git, GitHub, VS Code, Swift, Linux, SwiftUI, Ghos
 
 === STYLE ===
 - Warm, clear, concise (usually under 120 words unless asked for more)
+- Format replies with light Markdown the UI can render:
+  - **bold** for emails, project names, and key phrases
+  - [label](https://full-url) for links (never bare angle-bracket URLs like <https://...>)
+  - Short bullet lists with "- " when listing socials or projects
 - Prefer linking to real URLs above
 - You may mention that visitors can also browse the site sections (About, Projects, Journey, Tech, Contact) or GitHub for the latest work`;
 
