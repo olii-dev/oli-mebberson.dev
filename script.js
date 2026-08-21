@@ -301,5 +301,141 @@
         });
     }
 
+    (function initAskOli() {
+        var root = document.getElementById('ask-oli');
+        if (!root) return;
+
+        document.body.classList.add('has-ask-oli');
+
+        var fab = root.querySelector('.ask-oli-fab');
+        var panel = root.querySelector('.ask-oli-panel');
+        var closeBtn = root.querySelector('.ask-oli-close');
+        var form = root.querySelector('.ask-oli-form');
+        var input = root.querySelector('.ask-oli-input');
+        var sendBtn = root.querySelector('.ask-oli-send');
+        var messagesEl = root.querySelector('.ask-oli-messages');
+        var endpoint = (root.getAttribute('data-api') || '').trim();
+        var history = [];
+        var busy = false;
+
+        function openPanel() {
+            root.classList.add('is-open');
+            panel.hidden = false;
+            fab.setAttribute('aria-expanded', 'true');
+            if (!messagesEl.children.length) {
+                renderEmpty();
+            }
+            setTimeout(function () {
+                input.focus();
+            }, 120);
+        }
+
+        function closePanel() {
+            root.classList.remove('is-open');
+            panel.hidden = true;
+            fab.setAttribute('aria-expanded', 'false');
+        }
+
+        function renderEmpty() {
+            messagesEl.innerHTML =
+                '<div class="ask-oli-empty">' +
+                '<strong>Hey — ask me anything</strong>' +
+                '<p>Ask about Oli\'s projects, Lattice, Reko, Breezy, Orbit, or how to reach him. Off-topic questions get a polite redirect.</p>' +
+                '</div>';
+        }
+
+        function clearEmpty() {
+            var empty = messagesEl.querySelector('.ask-oli-empty');
+            if (empty) empty.remove();
+        }
+
+        function appendMessage(role, text, thinking) {
+            clearEmpty();
+            var wrap = document.createElement('div');
+            wrap.className = 'ask-oli-msg is-' + (role === 'user' ? 'user' : 'bot');
+            var meta = document.createElement('div');
+            meta.className = 'ask-oli-msg-meta';
+            meta.textContent = role === 'user' ? 'You' : 'Oli';
+            var bubble = document.createElement('div');
+            bubble.className = 'ask-oli-bubble' + (thinking ? ' is-thinking' : '');
+            bubble.textContent = text;
+            wrap.appendChild(meta);
+            wrap.appendChild(bubble);
+            messagesEl.appendChild(wrap);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            return bubble;
+        }
+
+        async function askQuark(message) {
+            if (!endpoint) {
+                return 'Ask Oli isn\'t connected yet. Deploy the Cloudflare Worker in /workers/ask-oli and set data-api on #ask-oli to your Worker URL.';
+            }
+
+            var res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    history: history.slice(-8)
+                })
+            });
+
+            var data = await res.json().catch(function () {
+                return {};
+            });
+
+            if (!res.ok) {
+                throw new Error(data.error || data.message || 'Quark had trouble answering. Try again in a moment.');
+            }
+
+            return (data.reply || '').trim() || '…';
+        }
+
+        fab.addEventListener('click', openPanel);
+        closeBtn.addEventListener('click', closePanel);
+
+        document.querySelectorAll('a[href="#ask-oli"]').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                openPanel();
+            });
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && root.classList.contains('is-open')) {
+                closePanel();
+            }
+        });
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var text = (input.value || '').trim();
+            if (!text || busy) return;
+
+            busy = true;
+            sendBtn.disabled = true;
+            input.value = '';
+            appendMessage('user', text);
+            history.push({ role: 'user', content: text });
+
+            var thinkingBubble = appendMessage('bot', 'Thinking…', true);
+
+            try {
+                var reply = await askQuark(text);
+                thinkingBubble.classList.remove('is-thinking');
+                thinkingBubble.textContent = reply;
+                history.push({ role: 'assistant', content: reply });
+            } catch (err) {
+                thinkingBubble.classList.remove('is-thinking');
+                thinkingBubble.textContent = err.message || 'Something went wrong.';
+            } finally {
+                busy = false;
+                sendBtn.disabled = false;
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                input.focus();
+            }
+        });
+    })();
+
     onScroll();
 })();

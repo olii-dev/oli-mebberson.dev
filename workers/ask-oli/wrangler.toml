@@ -1,0 +1,12 @@
+name = "ask-oli"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+workers_dev = true
+
+# Secrets (set via CLI, never commit):
+#   npx wrangler secret put GROQ_API_KEY
+#
+# Optional:
+# [vars]
+# GROQ_MODEL = "llama-3.1-8b-instant"
+# ALLOWED_ORIGIN = "https://oli.mebberson.com,https://oli-mebberson.is-cool.dev"

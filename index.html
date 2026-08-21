@@ -131,20 +131,23 @@
             <div class="projects-container" data-stagger="100">
                 <div class="featured-wrapper reveal">
                     <article class="project featured">
+                        <a href="projects/lattice/" class="project-card-link" aria-label="Lattice Systems case study"></a>
                         <h3>Lattice Systems</h3>
                         <p>My open-source small language model line — from a 42M-parameter model built from
-                            scratch to a 1.5B conversational fine-tune. <b>Try Lattice Mini live on Hugging Face.</b></p>
+                            scratch to Quark 1.5B. <b>Ask about me via Ask Oli on this site.</b></p>
                         <div class="project-links">
+                            <a href="#ask-oli" class="project-link">Ask Oli</a>
+                            <a href="https://huggingface.co/lattice-research/lattice-quark-1.5b" target="_blank"
+                                class="project-link">Quark on HF</a>
                             <a href="https://huggingface.co/spaces/oli-mebberson/lattice-mini" target="_blank"
                                 class="project-link">Try Mini</a>
-                            <a href="https://huggingface.co/oli-mebberson/lattice-pulse" target="_blank"
-                                class="project-link">Pulse on HF</a>
                             <a href="https://github.com/olii-dev/nano-gpt" target="_blank"
                                 class="project-link">Source</a>
                         </div>
                     </article>
                 </div>
                 <article class="project reveal">
+                    <a href="projects/reko/" class="project-card-link" aria-label="Reko case study"></a>
                     <h3>Reko</h3>
                     <p>Personalised movie and TV show recommendations based on what you love.
                         <b>Available on iOS.</b></p>
@@ -158,12 +161,14 @@
                     </div>
                 </article>
                 <article class="project reveal">
+                    <a href="projects/breezy/" class="project-card-link" aria-label="Breezy case study"></a>
                     <h3>Breezy <span class="badge">Beta</span></h3>
                     <p>Your personal weather companion. View local weather beautifully and privately.</p>
                     <a href="https://olii-dev.github.io/breezy-site/" target="_blank"
                         class="project-link">View Breezy</a>
                 </article>
                 <article class="project reveal">
+                    <a href="projects/orbit/" class="project-card-link" aria-label="Orbit case study"></a>
                     <h3>Orbit</h3>
                     <p>Chat with every major AI model using your own API keys.</p>
                     <a href="https://orbitthe.cloud/" target="_blank" class="project-link">Website</a>
@@ -376,6 +381,31 @@
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
         <i class="fas fa-arrow-up"></i>
     </button>
+
+    <div id="ask-oli" class="ask-oli" data-api="https://ask-oli.muselet.workers.dev">
+        <button type="button" class="ask-oli-fab" aria-label="Ask Oli" aria-expanded="false" aria-controls="ask-oli-panel">
+            <i class="fas fa-comment-dots" aria-hidden="true"></i>
+            <span class="ask-oli-fab-label">Ask Oli</span>
+        </button>
+        <div id="ask-oli-panel" class="ask-oli-panel" hidden>
+            <div class="ask-oli-header">
+                <div class="ask-oli-title">
+                    <span class="ask-oli-name">Ask Oli</span>
+                    <span class="ask-oli-model">Ask about Oli’s work</span>
+                </div>
+                <button type="button" class="ask-oli-close" aria-label="Close chat">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="ask-oli-messages" role="log" aria-live="polite"></div>
+            <form class="ask-oli-form">
+                <input type="text" class="ask-oli-input" placeholder="Ask about Oli, projects, Lattice…" autocomplete="off" maxlength="500">
+                <button type="submit" class="ask-oli-send" aria-label="Send">
+                    <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

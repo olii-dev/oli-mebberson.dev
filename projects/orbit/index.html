@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Orbit — chat with every major AI model using your own API keys.">
+    <meta property="og:title" content="Orbit | Oli Mebberson">
+    <meta property="og:description" content="Chat with every major AI model using your own API keys.">
+    <meta property="og:url" content="https://oli.mebberson.com/projects/orbit/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Orbit | Oli Mebberson">
+    <meta name="twitter:description" content="Chat with every major AI model using your own API keys.">
+    <title>Orbit | Oli Mebberson</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="../../images/favicon.png" type="image/x-icon">
+</head>
+
+<body>
+    <div id="loader" class="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="toast" class="toast">Copied!</div>
+
+    <div id="scroll-progress"></div>
+
+    <canvas id="particles"></canvas>
+
+    <nav id="navbar" class="navbar">
+        <div class="nav-inner">
+            <a href="../../" class="nav-logo">OM</a>
+            <div class="nav-links">
+                <a href="../../#about" class="nav-link">About</a>
+                <a href="../../#projects" class="nav-link">Projects</a>
+                <a href="../../#timeline" class="nav-link">Journey</a>
+                <a href="../../#tech-stack" class="nav-link">Tech</a>
+                <a href="../../#contact" class="nav-link">Contact</a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <div class="nav-mobile">
+            <a href="../../#about" class="nav-link">About</a>
+            <a href="../../#projects" class="nav-link">Projects</a>
+            <a href="../../#timeline" class="nav-link">Journey</a>
+            <a href="../../#tech-stack" class="nav-link">Tech</a>
+            <a href="../../#contact" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <div class="orbs" aria-hidden="true">
+        <div class="orb-parallax orb-parallax-1">
+            <div class="orb orb-1"></div>
+        </div>
+        <div class="orb-parallax orb-parallax-2">
+            <div class="orb orb-2"></div>
+        </div>
+        <div class="orb-parallax orb-parallax-3">
+            <div class="orb orb-3"></div>
+        </div>
+    </div>
+
+    <header>
+        <section id="hero">
+            <a href="../../#projects" class="project-back"><i class="fas fa-arrow-left"></i>&nbsp; Back</a>
+            <div class="hero-content">
+                <span class="case-study-tag"><i class="fas fa-book-open"></i>Case Study</span>
+                <div class="project-hero-role">Web App &middot; JavaScript</div>
+                <h1>Orbit</h1>
+                <p>Chat with every major AI model using your own API keys.</p>
+                <div class="cs-meta">
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">LLM APIs</span>
+                    <span class="tag">Web</span>
+                </div>
+                <div class="cs-links" style="justify-content: center;">
+                    <a href="https://orbitthe.cloud/" target="_blank"
+                        class="project-link">Website</a>
+                </div>
+            </div>
+        </section>
+    </header>
+
+    <main>
+        <section class="cs-section">
+            <h2>Overview</h2>
+            <p>Orbit is a web app that lets you chat with every major AI model using your own API keys. Instead of
+                locking you into a single provider, Orbit puts the choice in your hands.</p>
+        </section>
+
+        <section class="cs-section">
+            <h2>What It Does</h2>
+            <ul>
+                <li>Chat with every major AI model from one place.</li>
+                <li>Bring your own API keys — no subscriptions or lock-in.</li>
+                <li>A straightforward web interface focused on getting answers fast.</li>
+            </ul>
+        </section>
+
+        <section class="cs-section">
+            <h2>Links</h2>
+            <div class="cs-links">
+                <a href="https://orbitthe.cloud/" target="_blank"
+                    class="project-link">Website</a>
+            </div>
+        </section>
+
+        <div class="cs-note">
+            <p>Questions about Orbit? Reach out via <a href="mailto:oli@mebberson.com"
+                    class="fancy-underline" id="email-copy">email</a>.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <p>&copy; 2026 Oli Mebberson. Built by hand with HTML, CSS & a little JS.</p>
+            <div class="footer-links">
+                <a href="https://github.com/olii-dev" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/olii_dev" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://bsky.app/profile/funnylollypop.bsky.social" target="_blank" aria-label="Bluesky"><svg class="social-icon" viewBox="0 0 64 57" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55c2.897-6.013 10.79-17.218 18.127-22.745C56.965-2.284 64-4.436 64 6.13c0 2.566-1.468 21.533-2.326 24.63C59.18 40.79 48.438 43.73 38.265 41.14c10.932 1.89 13.686 7.724 7.69 15.858L32 57l-13.955-.002c-5.996-8.134-3.242-13.968 7.69-15.858-15.173 2.59-20.915-.35-23.409-10.38C1.468 27.663 0 8.696 0 6.13 0-4.436 7.035-2.284 13.873 3.805z"/></svg></a>
+                <a href="https://discord.gg/Trxcqusfgc" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                <a href="https://dev.to/oliidev" target="_blank" aria-label="Dev.to"><i class="fab fa-dev"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="../../script.js"></script>
+</body>
+
+</html>
