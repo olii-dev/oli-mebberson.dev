@@ -8,5 +8,5 @@ workers_dev = true
 #
 # Optional:
 # [vars]
-# GROQ_MODEL = "llama-3.1-8b-instant"
+# GROQ_MODEL = "openai/gpt-oss-20b"
 # ALLOWED_ORIGIN = "https://oli.mebberson.com,https://oli-mebberson.is-cool.dev"

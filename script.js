@@ -339,8 +339,8 @@
         function renderEmpty() {
             messagesEl.innerHTML =
                 '<div class="ask-oli-empty">' +
-                '<strong>Hey — ask me anything</strong>' +
-                '<p>Ask about Oli\'s projects, Lattice, Reko, Breezy, Orbit, or how to reach him. Off-topic questions get a polite redirect.</p>' +
+                '<strong>Hey — ask about Oli</strong>' +
+                '<p>I\'m Oli\'s assistant. Ask about his projects, Lattice, Reko, Breezy, Orbit, or how to reach him. Off-topic questions get a polite redirect.</p>' +
                 '</div>';
         }
 
@@ -355,7 +355,7 @@
             wrap.className = 'ask-oli-msg is-' + (role === 'user' ? 'user' : 'bot');
             var meta = document.createElement('div');
             meta.className = 'ask-oli-msg-meta';
-            meta.textContent = role === 'user' ? 'You' : 'Oli';
+            meta.textContent = role === 'user' ? 'You' : "Oli's assistant";
             var bubble = document.createElement('div');
             bubble.className = 'ask-oli-bubble' + (thinking ? ' is-thinking' : '');
             bubble.textContent = text;
@@ -368,7 +368,7 @@
 
         async function askQuark(message) {
             if (!endpoint) {
-                return 'Ask Oli isn\'t connected yet. Deploy the Cloudflare Worker in /workers/ask-oli and set data-api on #ask-oli to your Worker URL.';
+                return "Oli's assistant isn't connected yet. Deploy the Cloudflare Worker in /workers/ask-oli and set data-api on #ask-oli to your Worker URL.";
             }
 
             var res = await fetch(endpoint, {
