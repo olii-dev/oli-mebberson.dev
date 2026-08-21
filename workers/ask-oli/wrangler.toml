@@ -3,10 +3,11 @@ main = "src/index.js"
 compatibility_date = "2026-08-01"
 workers_dev = true
 
+[vars]
+GROQ_MODEL = "openai/gpt-oss-20b"
+
 # Secrets (set via CLI, never commit):
 #   npx wrangler secret put GROQ_API_KEY
 #
 # Optional:
-# [vars]
-# GROQ_MODEL = "openai/gpt-oss-20b"
 # ALLOWED_ORIGIN = "https://oli.mebberson.com,https://oli-mebberson.is-cool.dev"
