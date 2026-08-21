@@ -489,7 +489,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: message,
-                    history: history.slice(-8)
+                    history: history.slice(-10)
                 })
             });
 

@@ -183,7 +183,7 @@ async function callGroq(env, message, history, systemPrompt) {
     { role: 'system', content: systemPrompt },
     ...((history || [])
       .filter((t) => t && t.content && (t.role === 'user' || t.role === 'assistant'))
-      .slice(-8)
+      .slice(-10)
       .map((t) => ({
         role: t.role,
         content: String(t.content).slice(0, 1200),
@@ -254,7 +254,7 @@ export default {
     const message = String(body.message || '').trim().slice(0, 500);
     if (!message) return json({ error: 'message is required' }, 400, cors);
 
-    const history = Array.isArray(body.history) ? body.history.slice(-8) : [];
+    const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
 
     try {
       const githubNotes = await fetchGithubNotes();
