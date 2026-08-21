@@ -219,7 +219,6 @@ async function callGroq(env, message, history, systemPrompt) {
       model,
       messages,
       temperature: 0.6,
-      max_tokens: 450,
     }),
   });
 
