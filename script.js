@@ -422,6 +422,7 @@
 
         function openPanel() {
             root.classList.add('is-open');
+            document.body.classList.add('ask-oli-open');
             panel.hidden = false;
             fab.setAttribute('aria-expanded', 'true');
             panel.classList.remove('ask-oli-panel-anim');
@@ -437,8 +438,10 @@
 
         function closePanel() {
             root.classList.remove('is-open');
+            document.body.classList.remove('ask-oli-open');
             panel.hidden = true;
             fab.setAttribute('aria-expanded', 'false');
+            input.blur();
         }
 
         function renderEmpty() {

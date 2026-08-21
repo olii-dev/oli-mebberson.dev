@@ -10,4 +10,4 @@ GROQ_MODEL = "openai/gpt-oss-20b"
 #   npx wrangler secret put GROQ_API_KEY
 #
 # Optional:
-# ALLOWED_ORIGIN = "https://oli.mebberson.com,https://oli-mebberson.is-cool.dev"
+# ALLOWED_ORIGIN = "https://oli.mebberson.com"
