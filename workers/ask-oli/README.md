@@ -1,6 +1,6 @@
-# Oli's assistant Worker (Groq)
+# Lio Worker (Groq)
 
-Cloudflare Worker for the floating **Oli's assistant** chat. Uses Groq model `openai/gpt-oss-20b` by default (replacement for retired `llama-3.1-8b-instant`).
+Cloudflare Worker for the floating **Lio** chat on the portfolio. Uses Groq model `openai/gpt-oss-20b` by default.
 
 ## Deploy
 
