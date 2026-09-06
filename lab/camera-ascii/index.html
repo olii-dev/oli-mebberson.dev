@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera ASCII | Lab — Oli Mebberson</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@400;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="icon" href="../../images/favicon.png?v=2" type="image/png">
+    <style>
+        body { background: #050510; overflow: hidden; }
+        .lab-canvas-wrap {
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            background: #050510;
+            padding-bottom: 150px;
+            min-height: 100vh;
+        }
+        #ascii {
+            display: block;
+            width: 100%;
+            height: calc(100vh - 150px);
+            image-rendering: pixelated;
+        }
+        #preview {
+            position: fixed;
+            top: 0; left: 0;
+            width: 640px; height: 480px;
+            opacity: 0; pointer-events: none;
+        }
+        .lab-status {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 15px; z-index: 50;
+            pointer-events: none;
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+        .lab-status.hidden { opacity: 0; }
+    </style>
+</head>
+<body class="lab-page">
+    <a href="../../#lab" class="lab-back">← Lab</a>
+    <div class="lab-canvas-wrap">
+        <video id="preview" playsinline autoplay muted></video>
+        <canvas id="ascii"></canvas>
+    </div>
+    <p id="status" class="lab-status">Starting camera&hellip;</p>
+    <div class="lab-controls">
+        <div class="lab-panel">
+            <div class="lab-slider-row">
+                <span class="lab-slider-label">Density</span>
+                <input type="range" class="lab-slider" id="density" min="60" max="220" value="140">
+                <span class="lab-slider-value" id="density-val">140</span>
+            </div>
+            <div class="lab-btn-row">
+                <button type="button" class="lab-btn" id="mode-color">Colour</button>
+                <button type="button" class="lab-btn active" id="mode-mono">Mono</button>
+                <button type="button" class="lab-btn" id="mode-invert">Invert</button>
+            </div>
+        </div>
+        <p class="lab-hint">Your webcam, rendered as live ASCII art</p>
+    </div>
+
+    <script>
+        const video = document.getElementById('preview');
+        const canvas = document.getElementById('ascii');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        const status = document.getElementById('status');
+        const densitySlider = document.getElementById('density');
+        const densityVal = document.getElementById('density-val');
+        const modeColor = document.getElementById('mode-color');
+        const modeMono = document.getElementById('mode-mono');
+        const modeInvert = document.getElementById('mode-invert');
+
+        const CHARSET = [
+            ' ', '.', '\'', '`', '^', '"', ',', ':', ';', 'I', 'l', '!', 'i', '>', '<', '~', '+', '-', '_',
+            '?', ']', '[', '}', '{', '1', ')', '(', '|', '/', 't', 'f', 'j', 'r', 'x', 'n', 'u', 'v',
+            'c', 'z', 'X', 'Y', 'U', 'J', 'C', 'L', 'Q', '0', 'O', 'Z', 'm', 'w', 'q', 'p', 'd', 'b', 'k',
+            'h', 'a', 'o', '*', '#', 'M', 'W', '&', '8', '%', 'B', '@', '$'
+        ];
+        const charLUT = new Uint8Array(256);
+        for (let i = 0; i < 256; i++) {
+            charLUT[i] = Math.min(CHARSET.length - 1, (i * (CHARSET.length - 1) / 255) | 0);
+        }
+
+        const off = document.createElement('canvas');
+        const offCtx = off.getContext('2d', { willReadFrequently: true });
+
+        let cols = 140, rows = 1, colorMode = 'mono', running = false;
+        let cellW = 8, cellH = 14, stream = null;
+        let frameSkip = 0;
+        let fontSize = 12;
+
+        function setStatus(text, hide) {
+            status.textContent = text;
+            status.classList.toggle('hidden', !!hide);
+        }
+
+        function applyLayout() {
+            cols = parseInt(densitySlider.value, 10);
+            densityVal.textContent = cols;
+
+            const viewW = Math.max(1, window.innerWidth);
+            const viewH = Math.max(1, window.innerHeight - 150);
+
+            // Stretch cells to fill the full viewport — no black bars, no squash
+            cellW = viewW / cols;
+            // Guess rows from mono aspect, then stretch height to fit exactly
+            const approxRows = Math.max(1, Math.round(viewH / (cellW * 1.7)));
+            rows = approxRows;
+            cellH = viewH / rows;
+            fontSize = Math.min(cellW * 1.9, cellH * 0.98);
+
+            off.width = cols;
+            off.height = rows;
+            canvas.width = viewW;
+            canvas.height = viewH;
+
+            ctx.font = 'bold ' + fontSize + 'px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
+        }
+
+        function lum(r, g, b) {
+            return Math.min(255, Math.max(0, (0.299 * r + 0.587 * g + 0.114 * b) | 0));
+        }
+
+        function sampleVideo() {
+            const vw = video.videoWidth;
+            const vh = video.videoHeight;
+            if (!vw || !vh) return null;
+
+            // Cover crop to grid aspect so face isn't squished
+            const targetAspect = cols / rows;
+            const videoAspect = vw / vh;
+            let sx, sy, sw, sh;
+            if (videoAspect > targetAspect) {
+                sh = vh;
+                sw = vh * targetAspect;
+                sx = (vw - sw) * 0.5;
+                sy = 0;
+            } else {
+                sw = vw;
+                sh = vw / targetAspect;
+                sx = 0;
+                sy = (vh - sh) * 0.5;
+            }
+            // Mirror horizontally so it matches a normal camera (not selfie-reversed)
+            offCtx.save();
+            offCtx.translate(cols, 0);
+            offCtx.scale(-1, 1);
+            offCtx.drawImage(video, sx, sy, sw, sh, 0, 0, cols, rows);
+            offCtx.restore();
+            return offCtx.getImageData(0, 0, cols, rows).data;
+        }
+
+        function drawFrame() {
+            if (!cols || !rows || video.readyState < 2) return;
+
+            const data = sampleVideo();
+            if (!data) return;
+
+            ctx.fillStyle = '#050510';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = 'bold ' + fontSize + 'px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+            ctx.textBaseline = 'top';
+
+            if (colorMode === 'color') {
+                const step = cols * rows > 10000 ? 2 : 1;
+                for (let y = 0; y < rows; y++) {
+                    const py = y * cellH;
+                    for (let x = 0; x < cols; x += step) {
+                        const i = (y * cols + x) * 4;
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+                        ctx.fillText(CHARSET[charLUT[lum(r, g, b)]], x * cellW, py);
+                    }
+                }
+                return;
+            }
+
+            for (let y = 0; y < rows; y++) {
+                let line = '';
+                let sum = 0;
+                for (let x = 0; x < cols; x++) {
+                    const i = (y * cols + x) * 4;
+                    let bright = lum(data[i], data[i + 1], data[i + 2]);
+                    if (colorMode === 'invert') bright = 255 - bright;
+                    sum += bright;
+                    line += CHARSET[charLUT[bright]];
+                }
+                const avg = (sum / cols * 0.85) | 0;
+                ctx.fillStyle = 'rgb(' + avg + ',' + avg + ',' + Math.min(255, avg + 35) + ')';
+                ctx.fillText(line, 0, y * cellH);
+            }
+        }
+
+        function render() {
+            if (!running) return;
+            requestAnimationFrame(render);
+            frameSkip++;
+            const budget = cols * rows;
+            if (colorMode === 'color' && budget > 7000 && frameSkip % 2 !== 0) return;
+            if (budget > 12000 && frameSkip % 2 !== 0) return;
+            drawFrame();
+        }
+
+        function setColorMode(mode) {
+            colorMode = mode;
+            modeColor.classList.toggle('active', mode === 'color');
+            modeMono.classList.toggle('active', mode === 'mono');
+            modeInvert.classList.toggle('active', mode === 'invert');
+            applyLayout();
+            drawFrame();
+        }
+
+        densitySlider.addEventListener('input', () => {
+            applyLayout();
+            drawFrame();
+        });
+        window.addEventListener('resize', () => {
+            applyLayout();
+            if (running) drawFrame();
+        });
+        modeColor.addEventListener('click', () => setColorMode('color'));
+        modeMono.addEventListener('click', () => setColorMode('mono'));
+        modeInvert.addEventListener('click', () => setColorMode('invert'));
+
+        async function init() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setStatus('Camera API not available — use HTTPS or localhost');
+                return;
+            }
+
+            setStatus('Requesting camera…');
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            });
+            video.srcObject = stream;
+            video.playsInline = true;
+            video.muted = true;
+            await video.play();
+
+            await new Promise((resolve, reject) => {
+                const ready = () => {
+                    if (video.videoWidth > 0 && video.videoHeight > 0) resolve();
+                };
+                if (video.readyState >= 2) return ready();
+                video.addEventListener('loadeddata', ready, { once: true });
+                video.addEventListener('error', () => reject(new Error('video error')), { once: true });
+                setTimeout(() => reject(new Error('video timeout')), 10000);
+            });
+
+            applyLayout();
+            running = true;
+            setStatus('', true);
+            render();
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            running = !document.hidden;
+            if (running) render();
+        });
+        window.addEventListener('pagehide', () => {
+            running = false;
+            if (stream) stream.getTracks().forEach((t) => t.stop());
+        });
+
+        init().catch((err) => {
+            console.error(err);
+            setStatus('Camera access needed — allow it and refresh');
+        });
+    </script>
+</body>
+</html>

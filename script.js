@@ -267,6 +267,11 @@
         }
 
         function animate() {
+            if (document.hidden) {
+                requestAnimationFrame(animate);
+                return;
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (var i = 0; i < particles.length; i++) {

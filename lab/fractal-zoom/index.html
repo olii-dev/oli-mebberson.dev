@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Zoom | Lab — Oli Mebberson</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@400;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="icon" href="../../images/favicon.png?v=2" type="image/png">
+    <style>
+        body { background: #000; overflow: hidden; }
+        .lab-canvas-wrap {
+            background: #000;
+            padding-bottom: 130px;
+            min-height: 100vh;
+        }
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: calc(100vh - 130px);
+            cursor: grab;
+            touch-action: none;
+        }
+        #canvas.dragging { cursor: grabbing; }
+    </style>
+</head>
+<body class="lab-page">
+    <a href="../../#lab" class="lab-back">← Lab</a>
+    <div class="lab-canvas-wrap">
+        <canvas id="canvas" class="lab-canvas-fill"></canvas>
+    </div>
+    <div class="lab-controls">
+        <div class="lab-panel">
+            <div class="lab-btn-row">
+                <button type="button" class="lab-btn active" id="mode-mandelbrot">Mandelbrot</button>
+                <button type="button" class="lab-btn" id="mode-julia">Julia</button>
+                <button type="button" class="lab-btn" id="reset-btn">Reset</button>
+            </div>
+        </div>
+        <p class="lab-hint" id="hint">Scroll to zoom · drag to pan · double-click Julia to set constant</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'high-performance' });
+        const hint = document.getElementById('hint');
+        const modeMandelbrot = document.getElementById('mode-mandelbrot');
+        const modeJulia = document.getElementById('mode-julia');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // No hard zoom-in floor — float32 + double-double centre keeps going until precision dies
+        const MAX_SCALE = 4;
+        const WHEEL_FACTOR = 1.12;
+
+        if (!gl) {
+            hint.textContent = 'WebGL not available in this browser';
+        } else {
+            const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}';
+            // Centre kept in JS float64 and split hi/lo for the GPU
+            const fs = `
+                precision highp float;
+                uniform vec2 u_res;
+                uniform vec2 u_center_hi;
+                uniform vec2 u_center_lo;
+                uniform float u_scale;
+                uniform float u_mode;
+                uniform vec2 u_julia;
+                uniform float u_iters;
+
+                void main() {
+                    vec2 uv = (gl_FragCoord.xy / u_res - 0.5) * vec2(u_res.x / u_res.y, 1.0) * u_scale * 2.0;
+                    vec2 c = (u_center_hi + u_center_lo) + uv;
+                    vec2 z = u_mode < 0.5 ? vec2(0.0) : c;
+                    vec2 k = u_mode < 0.5 ? c : u_julia;
+                    float n = 0.0;
+                    float maxI = u_iters;
+                    for (int i = 0; i < 1200; i++) {
+                        if (float(i) >= maxI) break;
+                        if (dot(z, z) > 4.0) break;
+                        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + k;
+                        n = float(i);
+                    }
+                    if (n >= maxI - 1.0) {
+                        gl_FragColor = vec4(0.0);
+                        return;
+                    }
+                    float t = fract(n * 0.035 + length(z) * 0.1);
+                    vec3 col = 0.5 + 0.5 * cos(6.28318 * (vec3(0.0, 0.33, 0.67) + t));
+                    gl_FragColor = vec4(col, 1.0);
+                }
+            `;
+
+            function compile(type, src) {
+                const s = gl.createShader(type);
+                gl.shaderSource(s, src);
+                gl.compileShader(s);
+                return s;
+            }
+
+            const prog = gl.createProgram();
+            gl.attachShader(prog, compile(gl.VERTEX_SHADER, vs));
+            gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fs));
+            gl.linkProgram(prog);
+            gl.useProgram(prog);
+
+            const buf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+            const loc = gl.getAttribLocation(prog, 'p');
+            gl.enableVertexAttribArray(loc);
+            gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+            const uRes = gl.getUniformLocation(prog, 'u_res');
+            const uCenterHi = gl.getUniformLocation(prog, 'u_center_hi');
+            const uCenterLo = gl.getUniformLocation(prog, 'u_center_lo');
+            const uScale = gl.getUniformLocation(prog, 'u_scale');
+            const uMode = gl.getUniformLocation(prog, 'u_mode');
+            const uJulia = gl.getUniformLocation(prog, 'u_julia');
+            const uIters = gl.getUniformLocation(prog, 'u_iters');
+
+            let mode = 0;
+            // Keep centre in JS float64, split for GPU
+            let centerX = -0.5;
+            let centerY = 0;
+            let scale = 1.5;
+            let julia = { x: -0.8, y: 0.156 };
+            let drag = false;
+            let dragStart = null;
+            let centerStartX = 0;
+            let centerStartY = 0;
+            let activePointer = null;
+
+            function split(v) {
+                const hi = Math.fround(v);
+                return { hi, lo: v - hi };
+            }
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = Math.max(200, window.innerHeight - 130);
+                gl.viewport(0, 0, canvas.width, canvas.height);
+                draw();
+            }
+
+            function draw() {
+                const sx = split(centerX);
+                const sy = split(centerY);
+                // More iterations as you zoom in so detail doesn't turn black
+                const zoom = 1 / Math.max(scale, 1e-30);
+                const iters = Math.min(1200, Math.floor(180 + Math.log2(zoom + 1) * 55));
+
+                gl.uniform2f(uRes, canvas.width, canvas.height);
+                gl.uniform2f(uCenterHi, sx.hi, sy.hi);
+                gl.uniform2f(uCenterLo, sx.lo, sy.lo);
+                gl.uniform1f(uScale, scale);
+                gl.uniform1f(uMode, mode);
+                gl.uniform2f(uJulia, julia.x, julia.y);
+                gl.uniform1f(uIters, iters);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            }
+
+            function screenToComplex(sx, sy) {
+                const aspect = canvas.width / canvas.height;
+                return {
+                    x: centerX + (sx / canvas.width - 0.5) * scale * aspect * 2,
+                    y: centerY + (sy / canvas.height - 0.5) * scale * 2
+                };
+            }
+
+            function zoomAt(sx, sy, factor) {
+                const before = screenToComplex(sx, sy);
+                // No minimum — zoom until float64/GPU give out
+                scale = Math.min(MAX_SCALE, Math.max(Number.MIN_VALUE * 1e20, scale * factor));
+                const after = screenToComplex(sx, sy);
+                centerX += before.x - after.x;
+                centerY += before.y - after.y;
+                draw();
+            }
+
+            function endDrag() {
+                drag = false;
+                activePointer = null;
+                canvas.classList.remove('dragging');
+            }
+
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const r = canvas.getBoundingClientRect();
+                zoomAt(e.clientX - r.left, e.clientY - r.top, e.deltaY > 0 ? WHEEL_FACTOR : 1 / WHEEL_FACTOR);
+            }, { passive: false });
+
+            canvas.addEventListener('pointerdown', (e) => {
+                drag = true;
+                activePointer = e.pointerId;
+                dragStart = { x: e.clientX, y: e.clientY };
+                centerStartX = centerX;
+                centerStartY = centerY;
+                canvas.classList.add('dragging');
+                canvas.setPointerCapture(e.pointerId);
+            });
+
+            canvas.addEventListener('pointermove', (e) => {
+                if (!drag || e.pointerId !== activePointer) return;
+                const dx = e.clientX - dragStart.x;
+                const dy = e.clientY - dragStart.y;
+                const aspect = canvas.width / canvas.height;
+                centerX = centerStartX + (dx / canvas.width) * scale * aspect * 2;
+                centerY = centerStartY + (dy / canvas.height) * scale * 2;
+                draw();
+            });
+
+            canvas.addEventListener('pointerup', (e) => {
+                if (e.pointerId !== activePointer) return;
+                endDrag();
+            });
+
+            canvas.addEventListener('pointercancel', endDrag);
+            canvas.addEventListener('lostpointercapture', endDrag);
+
+            function reset() {
+                centerX = -0.5;
+                centerY = 0;
+                scale = 1.5;
+                julia = { x: -0.8, y: 0.156 };
+                draw();
+            }
+
+            modeMandelbrot.addEventListener('click', () => {
+                if (mode === 0) return;
+                mode = 0;
+                modeMandelbrot.classList.add('active');
+                modeJulia.classList.remove('active');
+                hint.textContent = 'Scroll to zoom · drag to pan';
+                reset();
+            });
+            modeJulia.addEventListener('click', () => {
+                if (mode === 1) return;
+                mode = 1;
+                modeJulia.classList.add('active');
+                modeMandelbrot.classList.remove('active');
+                hint.textContent = 'Scroll to zoom · drag to pan · double-click to set Julia constant';
+                reset();
+            });
+            resetBtn.addEventListener('click', reset);
+
+            canvas.addEventListener('dblclick', (e) => {
+                if (mode !== 1) return;
+                const r = canvas.getBoundingClientRect();
+                const c = screenToComplex(e.clientX - r.left, e.clientY - r.top);
+                julia.x = c.x;
+                julia.y = c.y;
+                draw();
+            });
+
+            window.addEventListener('resize', resize);
+            resize();
+        }
+    </script>
+</body>
+</html>
