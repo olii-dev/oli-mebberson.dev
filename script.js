@@ -16,6 +16,18 @@
     var orb3 = document.querySelector('.orb-parallax-3');
     var canvas = document.getElementById('particles');
     var projects = document.querySelectorAll('.project');
+    // Back off decorative animation if the visitor asks for less motion or this
+    // browser consistently misses frames. The page and Lio stay interactive.
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var lowMotion = reducedMotion.matches;
+    if (lowMotion) document.documentElement.classList.add('low-motion');
+    function setLowMotion() {
+        lowMotion = true;
+        document.documentElement.classList.add('low-motion');
+    }
+    reducedMotion.addEventListener('change', function (event) {
+        if (event.matches) setLowMotion();
+    });
 
     function onScroll() {
         var scrollY = window.scrollY || window.pageYOffset;
@@ -144,7 +156,7 @@
     });
 
     document.addEventListener('mousemove', function (e) {
-        if (!orb1) return;
+        if (!orb1 || lowMotion) return;
 
         var x = (e.clientX / window.innerWidth - 0.5) * 2;
         var y = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -156,6 +168,7 @@
 
     projects.forEach(function (card) {
         card.addEventListener('mousemove', function (e) {
+            if (lowMotion) return;
             var rect = card.getBoundingClientRect();
             var x = e.clientX - rect.left;
             var y = e.clientY - rect.top;
@@ -192,6 +205,7 @@
 
     (function initTyping() {
         if (!typedTextEl) return;
+        if (lowMotion) { typedTextEl.textContent = 'Full Stack Web Developer'; return; }
 
         var titles = [
             'Full Stack Web Developer',
@@ -209,6 +223,7 @@
         var pauseStart = 500;
 
         function tick() {
+            if (lowMotion) { typedTextEl.textContent = titles[0]; return; }
             var current = titles[titleIndex];
 
             if (!isDeleting) {
@@ -241,7 +256,7 @@
     })();
 
     (function initParticles() {
-        if (!canvas) return;
+        if (!canvas || lowMotion) return;
         var ctx = canvas.getContext('2d');
         var particles = [];
         var count = 40;
@@ -266,12 +281,30 @@
             });
         }
 
-        function animate() {
+        var lastFrame = 0;
+        var measuredFrames = 0;
+        var slowFrames = 0;
+        function animate(now) {
+            if (lowMotion) return;
             if (document.hidden) {
+                lastFrame = 0;
                 requestAnimationFrame(animate);
                 return;
             }
-
+            if (lastFrame) {
+                var gap = now - lastFrame;
+                // Ignore tab sleeps and navigation stalls, not real frame misses.
+                if (gap < 250) {
+                    measuredFrames++;
+                    if (gap > 35) slowFrames++;
+                    if (measuredFrames === 120) {
+                        if (slowFrames >= 18) { setLowMotion(); return; }
+                        measuredFrames = 0;
+                        slowFrames = 0;
+                    }
+                }
+            }
+            lastFrame = now;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (var i = 0; i < particles.length; i++) {

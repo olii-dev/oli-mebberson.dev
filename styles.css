@@ -2113,3 +2113,18 @@ body.ask-oli-open {
         width: calc(100vw - 32px);
     }
 }
+
+/* Keep the content and controls, but skip expensive decorative compositing. */
+.low-motion #particles,
+.low-motion .orbs { display: none; }
+.low-motion *,
+.low-motion *::before,
+.low-motion *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
